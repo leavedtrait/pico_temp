@@ -4,11 +4,14 @@
 #![no_std]
 #![no_main]
 
-use bsp::entry;
+
+use bsp::{entry, pac::{adc, ADC}};
 use defmt::*;
 use defmt_rtt as _;
 use embedded_hal::digital::v2::OutputPin;
+use bsp::hal::{adc::AdcPin,Adc};
 use panic_probe as _;
+use defmt::info;
 
 // Provide an alias for our BSP so we can switch targets quickly.
 // Uncomment the BSP you included in Cargo.toml, the rest of the code does not need to change.
@@ -21,7 +24,7 @@ use bsp::hal::{
     sio::Sio,
     watchdog::Watchdog,
 };
-
+use embedded_hal::adc::OneShot;
 #[entry]
 fn main() -> ! {
     info!("Program start");
@@ -63,14 +66,32 @@ fn main() -> ! {
     // LED to one of the GPIO pins, and reference that pin here. Don't forget adding an appropriate resistor
     // in series with the LED.
     let mut led_pin = pins.led.into_push_pull_output();
+    let mut blue = pins.gpio6.into_push_pull_output();
+    let mut green = pins.gpio7.into_push_pull_output();
+    let mut red = pins.gpio8.into_push_pull_output();
+
+    let adc = Adc::new(pac.ADC, &mut pac.RESETS);
+
 
     loop {
         info!("on!");
         led_pin.set_high().unwrap();
-        delay.delay_ms(500);
+        red.set_high().unwrap();
+        delay.delay_ms(50);
+        blue.set_high().unwrap();
+        delay.delay_ms(50);
+        green.set_high().unwrap();
+        delay.delay_ms(50);
+        //delay.delay_ms(500);
         info!("off!");
         led_pin.set_low().unwrap();
-        delay.delay_ms(500);
+        red.set_low().unwrap();
+        delay.delay_ms(50);
+        blue.set_low().unwrap();
+        delay.delay_ms(50);
+        green.set_low().unwrap();
+        delay.delay_ms(50);
+        // delay.delay_ms(500);
     }
 }
 
